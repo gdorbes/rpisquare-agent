@@ -1,6 +1,6 @@
 {
   "name": "rpi-agent",
-  "version": "0.5.4",
+  "version": "0.5.6",
   "description": "RPi² agent",
   "main": "index.js",
   "type": "module",
@@ -8,8 +8,8 @@
     "lib": "esm"
   },
   "scripts": {
-    "test": "node test/agent.test.js",
-    "start": "node test/agent.test.js"
+    "test": "node ./test/agent.test.js",
+    "start": "node ./test/agent.test.js"
   },
   "repository": {
     "type": "git",
