@@ -1,6 +1,6 @@
 {
   "name": "rpi-agent",
-  "version": "0.5.11",
+  "version": "0.5.12",
   "description": "RPi² agent",
   "main": "index.js",
   "type": "module",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gdorbes/rpi-agent"
+    "url": "git+https://github.com/gdorbes/rpi-agent.git"
   },
   "keywords": [
     "raspberry",
