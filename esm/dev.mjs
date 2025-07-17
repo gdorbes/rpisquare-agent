@@ -1,8 +1,7 @@
 // -------------------------------------------------------------------
 // RPi² AGENT - DEV TOOLS
 // -------------------------------------------------------------------
-const DEBUG = true
-
+let showLog = true
 // -------------------------------------------------------------------
 //FUNCTIONS
 /** ------------------------------------------------------------------
@@ -11,7 +10,7 @@ const DEBUG = true
  *              global constant required: DEBUG
  */
 export const log = function () {
-    if (DEBUG) {
+    if (showLog) {
         const date = new Date()
         let now = date.toLocaleTimeString() + "." + date.getMilliseconds().toLocaleString('en', {
             minimumIntegerDigits: 3,
@@ -22,6 +21,13 @@ export const log = function () {
         console.log.apply(console, args)
     }
 }
-// -------------------------------------------------------------------
-// EoF
-// -------------------------------------------------------------------
+/** ------------------------------------------------------------------
+ * @function logInit
+ * @description global customized timestamped log
+ *              global constant required: DEBUG
+ */
+export const logInit = mode => {
+    showLog = true
+    mode ? log("debug mode enabled") : log("debug mode disabled")
+    showLog = mode
+}

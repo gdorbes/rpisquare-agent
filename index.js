@@ -3,14 +3,14 @@
 // -------------------------------------------------------------------
 import {readFileSync, writeFileSync} from "fs"
 import {io} from "socket.io-client"
-import {log} from "./esm/dev.mjs"
+import {log, logInit} from "./esm/dev.mjs"
 import {ecdsaJwkKeypair, rsaHexKeypair} from "./esm/sec.mjs";
-import {model, serial, networkInterface} from "./esm/hwi.mjs"
+import {model, serial, iface} from "./esm/hwi.mjs"
 
 // -------------------------------------------------------------------
 // GLOBAL CONSTANTS
 // -------------------------------------------------------------------
-export const ROM = {
+const ROM = {
     PREFIX: "ruc-",
     API: {SERVER: "https://api.rpisquare.com"},
     SOCKET: {
@@ -29,25 +29,25 @@ export const ROM = {
 // -------------------------------------------------------------------
 // GLOBAL VARIABLES
 // -------------------------------------------------------------------
-export let agent = {
+let agent = {
     serial: await serial(),
     model: await model(),
-    iface: await networkInterface()
+    iface: await iface()
 }
-export let config = {
+let config = {
     room: "", // Defined with uuid on agent registration e.g. "ns0000...1234"
     spacePubEcdsa: "none", // idem,
     spacePubRsa: "none", // idem
     ecdsa: {}, // Agent ECDSA keypair
     rsa: {} // Agent RSA keypair
 }
-export let socket
+let socket
 
 // -------------------------------------------------------------------
 // INIT
 // -------------------------------------------------------------------
-const init = async () => {
-
+export const rpiAgent = async (debug = true) => {
+    logInit(debug)
     log("agent:", agent)
 
     // Init configuration either with either found file of default value
@@ -106,7 +106,6 @@ const init = async () => {
         }
     )
 }
-init()
 // -------------------------------------------------------------------
 // EoF
 // -------------------------------------------------------------------

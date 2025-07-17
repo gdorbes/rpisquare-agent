@@ -1,17 +1,18 @@
 {
   "name": "rpi-agent",
-  "version": "0.5.0",
+  "version": "0.5.3",
   "description": "RPi² agent",
-  "main": "index.mjs",
+  "main": "index.js",
+  "type": "module",
   "directories": {
-    "lib": "lib"
+    "lib": "esm"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/agent.test.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/dorbes/rpi-agent.git"
+    "url": "https://github.com/gdorbes/rpi-agent"
   },
   "keywords": [
     "raspberry",
@@ -19,11 +20,8 @@
     "agent"
   ],
   "author": "Guillaume DORBES",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://gitlab.com/dorbes/rpi-agent/issues"
-  },
-  "homepage": "https://gitlab.com/dorbes/rpi-agent#readme",
+  "license": "MIT",
+  "homepage": "https://github.com/gdorbes/rpi-agent",
   "dependencies": {
     "socket.io-client": "^4.8.1"
   }

@@ -8,7 +8,52 @@ import {log} from "./dev.mjs"
 // -------------------------------------------------------------------
 // CONSTANTS AND VARIABLES
 // -------------------------------------------------------------------
-export const platform = os.platform()
+const PLATFORM = os.platform()
+const CMDS = {
+    serial: {
+        linux: {
+            cmd: "cat /proc/cpuinfo | grep Serial",
+            flt: str => {
+                return str.split(":")[1].trim()
+            }
+        },
+        darwin: {
+            cmd: "system_profiler SPHardwareDataType",
+            flt: str => {
+                return str.match(/Serial Number.*: (.+)/)[1].trim()
+            }
+        }
+    },
+    model: {
+        linux: {
+            cmd: "cat /proc/cpuinfo | grep Model",
+            flt: str => {
+                return str.split(":")[1].trim()
+            }
+        },
+        darwin: {
+            cmd: "system_profiler SPHardwareDataType",
+            flt: str => {
+                return str.match(/Model Name.*: (.+)/)[1].trim()
+            }
+        }
+    },
+    iface: {
+        linux: {
+            cmd: "route | grep '^default' | grep -o '[^ ]*$'",
+            flt: str => {
+                return str.substring(0, 4)
+            }
+        },
+        darwin: {
+            cmd: "route -n get default | grep 'interface:' | grep -o '[^ ]*$'",
+            flt: str => {
+                return str.substring(0, 4)
+            }
+        }
+    }
+}
+
 // -------------------------------------------------------------------
 //FUNCTIONS
 /** ------------------------------------------------------------------
@@ -17,20 +62,51 @@ export const platform = os.platform()
  * @param {String} cmd
  * @return {Promise}
  */
-export const run = function (cmd) {
+const run = function (cmd) {
     return new Promise(resolve => {
-        try {
-            exec(cmd, (err, stdout, stderr) => {
-                if (stderr)
-                    throw new Error((stderr))
-                else
-                    resolve(stdout)
+
+        exec(cmd, (error, stdout, stderr) => {
+            if (error) {
+                resolve({
+                    type: "error",
+                    data: error
+                })
+                return
+            }
+            if (stderr) {
+                resolve({
+                    type: "stderr",
+                    data: stderr
+                })
+                return
+            }
+            resolve({
+                type: "stdout",
+                data: stdout
             })
-        } catch (err) {
-            log("run error:", err)
-            resolve(false)
-        }
+        })
     })
+}
+
+/** ------------------------------------------------------------------
+ * @function runCmd
+ * @description Exec command defined in CMDS
+ * @param {String} name - Command name
+ * @return {Promise}
+ */
+const runCmd = async name => {
+    if (CMDS[name][PLATFORM]) {
+        const result = await run(CMDS[name][PLATFORM].cmd)
+        if (result.type === "stdout") {
+            return CMDS[name][PLATFORM].flt(result.data)
+        } else {
+            log("serial cmd error:", result.type, result.data)
+            return "undefined"
+        }
+    }
+
+    log("unsupported platform:", PLATFORM)
+    return "undefined"
 }
 
 /** ------------------------------------------------------------------
@@ -39,15 +115,7 @@ export const run = function (cmd) {
  * @return {Promise}
  */
 export const serial = async () => {
-    switch (os.platform()) {
-        case "linux":
-            const info = await run("cat /proc/cpuinfo | grep Serial")
-            return info.split(":")[1].trim()
-        case "darwin":
-            const hw = await run("system_profiler SPHardwareDataType")
-            return hw.match(/Serial Number.*: (.+)/)[1].trim()
-        default:
-    }
+    return await runCmd("serial")
 }
 /** ------------------------------------------------------------------
  * @function model
@@ -55,32 +123,16 @@ export const serial = async () => {
  * @return {Promise}
  */
 export const model = async () => {
-    switch (os.platform()) {
-        case "linux":
-            const info = await run("cat /proc/cpuinfo | grep Model")
-            return info.split(":")[1].trim()
-        case "darwin":
-            const hw = await run("system_profiler SPHardwareDataType")
-            return hw.match(/Model Name.*: (.+)/)[1].trim()
-        default:
-    }
+    return await runCmd("model")
 }
 
 /** ------------------------------------------------------------------
- * @function networkInterface
+ * @function iface
  * @description Return network interface
  * @return {Promise}
  */
-export const networkInterface = async () => {
-    let iface = "none"
-    switch (os.platform()) {
-        case "linux":
-            iface = await run("route | grep '^default' | grep -o '[^ ]*$'")
-            break
-        case "darwin":
-            iface = await run("route -n get default | grep 'interface:' | grep -o '[^ ]*$'")
-    }
-    return iface.substring(0, 4)
+export const iface = async () => {
+    return await runCmd("iface")
 }
 
 // -------------------------------------------------------------------
