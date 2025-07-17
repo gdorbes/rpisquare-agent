@@ -1,6 +1,6 @@
 {
   "name": "rpi-agent",
-  "version": "0.5.12",
+  "version": "0.5.13",
   "description": "RPi² agent",
   "main": "index.js",
   "type": "module",
