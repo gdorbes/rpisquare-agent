@@ -1,3 +1,3 @@
-import {rpiAgent} from "../index.js"
+import {rpiAgent} from "./index.js"
 
 rpiAgent()
