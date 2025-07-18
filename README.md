@@ -15,7 +15,7 @@ npm i rpi-agent
 
 ## Usage
 
-Add the following content in your Nodejs script
+Add the following content to your Nodejs script
 
 ``` js
 import {rpiAgent} from "rpi-agent"
