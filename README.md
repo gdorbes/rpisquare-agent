@@ -23,3 +23,6 @@ const debug = true // Show console or not. Default is true
 rpiAgent(debug)
 ```
 
+## Status
+
+Work in progress. Further details to come soon.
