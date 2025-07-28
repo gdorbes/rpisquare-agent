@@ -1,16 +1,22 @@
 // -------------------------------------------------------------------
 // RPi² AGENT - DEV TOOLS
 // -------------------------------------------------------------------
-let showLog = true
-// -------------------------------------------------------------------
 //FUNCTIONS
 /** ------------------------------------------------------------------
  * @function log
- * @description global customized timestamped log
- *              global constant required: DEBUG
+ * @description Global customized timestamped log
+ *              First call to enable/disable console with boolean parameter
  */
 export const log = function () {
-    if (showLog) {
+
+    // First call to enable/disable console
+    if (log.active === undefined && typeof arguments[0] === "boolean") {
+        log.active = arguments[0]
+        return
+    }
+
+    // Further calls
+    if (log.active) {
         const date = new Date()
         let now = date.toLocaleTimeString() + "." + date.getMilliseconds().toLocaleString('en', {
             minimumIntegerDigits: 3,
@@ -20,14 +26,4 @@ export const log = function () {
         let args = Array.prototype.concat.apply([now, "🔎"], arguments)
         console.log.apply(console, args)
     }
-}
-/** ------------------------------------------------------------------
- * @function logInit
- * @description global customized timestamped log
- *              global constant required: DEBUG
- */
-export const logInit = mode => {
-    showLog = true
-    mode ? log("debug mode enabled") : log("debug mode disabled")
-    showLog = mode
 }
