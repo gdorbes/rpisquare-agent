@@ -1,24 +1,21 @@
 // -------------------------------------------------------------------
 // RPi² AGENT - DEV TOOLS
 // -------------------------------------------------------------------
+// CONSTANTS AND VARIABLES
+// -------------------------------------------------------------------
+export let debug = true
+// -------------------------------------------------------------------
 // FUNCTIONS
 /** ------------------------------------------------------------------
  * @function log
- * @description Global customized timestamped log
- *              First call to enable/disable console with boolean parameter
+ * @description Global customized timestamped console.log
+ *              Requires global variable `debug`
  */
 export const log = function () {
 
-    // First call to enable/disable console
-    if (log.active === undefined && typeof arguments[0] === "boolean") {
-        log.active = arguments[0]
-        return
-    }
-
-    // Further calls
-    if (log.active) {
+    if (debug) {
         const date = new Date()
-        let now = date.toLocaleTimeString() + "." + date.getMilliseconds().toLocaleString('en', {
+        const now = date.toLocaleTimeString() + "." + date.getMilliseconds().toLocaleString('en', {
             minimumIntegerDigits: 3,
             minimumFractionDigits: 0,
             useGrouping: false
