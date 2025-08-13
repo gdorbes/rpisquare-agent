@@ -21,10 +21,10 @@ export const log = function () {
             minimumFractionDigits: 0,
             useGrouping: false
         })
-        let args = Array.prototype.concat.apply([now, "🔎"], arguments)
-        console.log.apply(console, args)
+        console.log.apply(console, Array.prototype.concat.apply([now, "🔎"], arguments))
     }
 }
+
 // -------------------------------------------------------------------
 // EoF
 // -------------------------------------------------------------------
