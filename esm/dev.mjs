@@ -24,6 +24,14 @@ export const log = function () {
         console.log.apply(console, Array.prototype.concat.apply([now, "🔎"], arguments))
     }
 }
+/** ------------------------------------------------------------------
+ * @function sleep
+ * @description Wait before continuing
+ * @param {Number} ms
+ */
+export const sleep = ms => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // -------------------------------------------------------------------
 // EoF
