@@ -55,9 +55,8 @@ const MY_COMMANDS = {
     }
 }
 
-export let hw = {}
 // -------------------------------------------------------------------
-//FUNCTIONS
+// SHELL + SCRIPT FUNCTIONS
 /** ------------------------------------------------------------------
  * @function run
  * @description Exec command in underlying os as Promise
@@ -111,14 +110,21 @@ const runCmd = async name => {
     log("unsupported platform:", platform)
     return "undefined"
 }
-
+// -------------------------------------------------------------------
+// HARDWARE FUNCTIONS
+// -------------------------------------------------------------------
+export let hw = {}
 /** ------------------------------------------------------------------
  * @function hw.serial
  * @description Return hardware serial number
  * @return {Promise}
  */
 hw.serial = async () => {
-    return await runCmd("serial")
+    if (!hw.serial.value) {
+        const serial = await runCmd("serial")
+        hw.serial.value = serial.toLowerCase()
+    }
+    return hw.serial.value
 }
 /** ------------------------------------------------------------------
  * @function hw.model
@@ -128,8 +134,8 @@ hw.serial = async () => {
 hw.model = async () => {
 
     if (!hw.model.value) {
-        hw.model.value = await runCmd("model")
-        hw.model.value = hw.model.value.toLowerCase()
+        const model = await runCmd("model")
+        hw.model.value = model.toLowerCase()
     }
     return hw.model.value
 }
@@ -140,7 +146,11 @@ hw.model = async () => {
  * @return {Promise}
  */
 hw.iface = async () => {
-    return await runCmd("iface")
+    if (!hw.iface.value) {
+        const iface = await runCmd("model")
+        hw.iface.value = iface.toLowerCase()
+    }
+    return hw.iface.value
 }
 /** ------------------------------------------------------------------
  * @function hw.name
@@ -148,15 +158,14 @@ hw.iface = async () => {
  * @return {Promise}
  */
 hw.name = async () => {
-    let model = await hw.model()
-    model = model.toLowerCase()
-    if (model.search("raspberry") !== -1) {
-        return "raspberry"
+    if (!hw.name.value) {
+        hw.name.value = await hw.model()
+        if (hw.name.value.search("raspberry") !== -1)
+            hw.name.value = "raspberry"
+        if (hw.name.value.search("mac") !== -1)
+            hw.name.value = "mac"
     }
-    if (model.search("mac") !== -1) {
-        return "mac"
-    }
-    return "unknown"
+    return hw.name.value
 }
 /** ------------------------------------------------------------------
  * @function osInfo
@@ -164,46 +173,49 @@ hw.name = async () => {
  * @return {Promise}
  */
 hw.os = async () => {
-    const hwName = await hw.name()
-    const response = {
-        version: "unknown",
-        name: "unknown"
-    }
-    let returned
-    if (hwName === "mac") {
-        const latestVersions = {
-            "15": "sequoia",
-            "14": "sonoma",
-            "13": "ventura",
-            "12": "monterey",
-            "11": "big sur",
-        }
-        returned = await run("sw_vers -productVersion")
-        if (returned.type === "stdout") {
-            response.version = returned.data.replace("\n", "").trim()
-            const known = latestVersions[response.version.substring(0, 2)]
-            known ? response.name = known : false
-        }
-    }
-    if (hwName === "raspberry") {
-        returned = await run("cat /etc/os-release")
-        if (returned.type === "stdout") {
 
-            const lines = returned.data.split("\n")
-            const info = {}
-            lines.forEach(line => {
-                const [key, value] = line.split("=")
-                if (key && value) {
-                    info[key] = value.replace(/"/g, "");
-                }
-            })
-            response.version = info.VERSION_ID
-            response.name = info.VERSION_CODENAME.toLowerCase()
+    if (!hw.os.value) {
+        hw.os.value = {
+            version: "unknown",
+            name: "unknown"
+        }
+        const hwName = await hw.name()
+        let returned
+        if (hwName === "mac") {
+            const latestVersions = {
+                "15": "sequoia",
+                "14": "sonoma",
+                "13": "ventura",
+                "12": "monterey",
+                "11": "big sur",
+            }
+            returned = await run("sw_vers -productVersion")
+            if (returned.type === "stdout") {
+                hw.os.value.version = returned.data.replace("\n", "").trim()
+                const known = latestVersions[hw.os.value.version.substring(0, 2)]
+                known ? hw.os.value.name = known : false
+            }
+        }
+
+        if (hwName === "raspberry") {
+            returned = await run("cat /etc/os-release")
+            if (returned.type === "stdout") {
+
+                const lines = returned.data.split("\n")
+                const info = {}
+                lines.forEach(line => {
+                    const [key, value] = line.split("=")
+                    if (key && value) {
+                        info[key] = value.replace(/"/g, "");
+                    }
+                })
+                hw.os.value.version = info.VERSION_ID
+                hw.os.value.name = info.VERSION_CODENAME.toLowerCase()
+            }
         }
     }
-    return response
+    return hw.os.value
 }
-
 
 // -------------------------------------------------------------------
 // EoF
