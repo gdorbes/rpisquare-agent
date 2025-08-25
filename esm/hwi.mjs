@@ -3,6 +3,7 @@
 // -------------------------------------------------------------------
 import {exec} from "child_process"
 import * as os from "os"
+import * as fs from "fs"
 import {log} from "./dev.mjs"
 
 // -------------------------------------------------------------------
@@ -167,6 +168,20 @@ hw.name = async () => {
     }
     return hw.name.value
 }
+/** ------------------------------------------------------------------
+ * @function hw.isRPi
+ * @description Return hardware name
+ * @return {Boolean}
+ */
+hw.isRPi = () => {
+    try {
+        const cpuInfo = fs.readFileSync("/proc/cpuinfo", "utf8");
+        return /Raspberry Pi/i.test(cpuInfo);
+    } catch (err) {
+        return false;
+    }
+}
+
 /** ------------------------------------------------------------------
  * @function osInfo
  * @description Return OS version and codename
