@@ -1,9 +1,8 @@
 # rpisquare-agent
-```
 ![Static Badge](https://img.shields.io/badge/rpi--io-_2.1.x_-FF5500?style=flat) ![Static Badge](https://img.shields.io/badge/Nodejs-%3E_23-66cc33?logo=nodedotjs&logoColor=white) ![Static Badge](https://img.shields.io/badge/NPM-%3E_10-CC3534?logo=npm&logoColor=white) ![Static Badge](https://img.shields.io/badge/Raspberry_Pi-Zero2_4B_5B-C51A4A?logo=raspberrypi&logoColor=white) ![Static Badge](https://img.shields.io/badge/OS-Bookworm_Trixie-0D7AB9?style=flat)
 
-Current version is 2.1.1. More details in [CHANGELOG.md](CHANGELOG.md).
-```
+Current version is 0.6.x. More details in [CHANGELOG.md](CHANGELOG.md).
+
 
 
 
