@@ -3,14 +3,16 @@
 
 Current version is 0.6.x. More details in [CHANGELOG.md](CHANGELOG.md).
 
-
-
-
 **rpisquare-agent** is part of the [rpisquare.com](https://rpisquare.com) service that aims at managing remote Raspberry Pi GPIO-based sensors and actuators. 
 
 **rpisquare-agent** is the module to install on Raspberry Pi devices to manage their GPIOs remotely. See [rpisquare.com](https://rpisquare.com) for further details about the solution architecture and components.
 
 ## Prerequisites
+
+As **rpisquare-agent**  uses the module [**rpi-io**] (https://github.com/gdorbes/rpi-io) for GPIO interactions, the prerequisites are the same.
+
+Also **rpisquare-agent**  must connected to the Internet to communicate with the *rpisquare API server* based on standard HTTP exchanges and  [socket.io](https://socket.io/) WebSocket.
+
 
 **rpi-agent** is a Nodejs module to run on each *Rasperry Pi* device that you want to manage. The current version has been tested with *Pi 5*, *Pi 4B*, *Pi Zero 2 W* running Raspberry Pi OS v12 a.k.a. Bookworm and  Nodejs v23+.
 
