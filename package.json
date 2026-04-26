@@ -1,29 +1,43 @@
 {
   "name": "rpi-agent",
-  "version": "0.5.13",
-  "description": "RPi² agent",
-  "main": "index.js",
+  "version": "0.6.2",
+  "description": "Raspberry Pi agent for service rpisquare.com",
+  "main": "./agent.mjs",
+  "exports": "./agent.mjs",
   "type": "module",
-  "scripts": {
-    "test": "node test.js",
-    "start": "node test.js"
-  },
   "directories": {
     "lib": "esm"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gdorbes/rpi-agent.git"
+    "url": "git+https://github.com/gdorbes/rpisquare-agent.git"
   },
   "keywords": [
     "raspberry",
-    "pi",
-    "agent"
+    "raspberry-pi",
+    "gpio",
+    "libgpiod",
+    "nodejs",
+    "esm",
+    "napi",
+    "output",
+    "input",
+    "monitor",
+    "pwm",
+    "linux",
+    "bookworm",
+    "trixie",
+    "iot",
+    "embedded"
   ],
   "author": "Guillaume DORBES",
   "license": "MIT",
-  "homepage": "https://github.com/gdorbes/rpi-agent",
+  "homepage": "https://github.com/gdorbes/rpisquare-agent",
+  "bugs": {
+    "url": "https://github.com/gdorbes/rpisquare-agent/issues"
+  },
   "dependencies": {
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "rpi-io": ">=2.1.0"
   }
 }

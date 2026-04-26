@@ -12,3 +12,10 @@ node_modules/
 
 # App config file
 config-rpi².json
+
+# Local old files
+_archive/
+
+# Test packs
+*.tgz
+
