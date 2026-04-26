@@ -9,7 +9,7 @@ Current version is 0.6.x. More details in [CHANGELOG.md](CHANGELOG.md).
 
 ## Prerequisites
 
-As **rpisquare-agent**  uses the module [**rpi-io**] (https://github.com/gdorbes/rpi-io) for GPIO interactions, the prerequisites are the same.
+As **rpisquare-agent**  uses the module [**rpi-io**](https://github.com/gdorbes/rpi-io) for GPIO interactions, the prerequisites are the same.
 
 Also **rpisquare-agent**  must connected to the Internet to communicate with the *rpisquare API server* based on standard HTTP exchanges and  [socket.io](https://socket.io/) WebSocket.
 
