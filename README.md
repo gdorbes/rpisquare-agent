@@ -22,6 +22,7 @@ From you project directory, just install the NPM package.
 ```shell
 npm i rpisquare-agent
 ```
+## TO BE CONTINUED
 
 ## Licence
 
