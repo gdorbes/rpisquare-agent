@@ -1,17 +1,7 @@
 {
-  "name": "rpi-agent",
+  "name": "rpisquare-agent",
   "version": "0.6.2",
   "description": "Raspberry Pi agent for service rpisquare.com",
-  "main": "./agent.mjs",
-  "exports": "./agent.mjs",
-  "type": "module",
-  "directories": {
-    "lib": "esm"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gdorbes/rpisquare-agent.git"
-  },
   "keywords": [
     "raspberry",
     "raspberry-pi",
@@ -30,14 +20,27 @@
     "iot",
     "embedded"
   ],
-  "author": "Guillaume DORBES",
-  "license": "MIT",
   "homepage": "https://github.com/gdorbes/rpisquare-agent",
   "bugs": {
     "url": "https://github.com/gdorbes/rpisquare-agent/issues"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gdorbes/rpisquare-agent.git"
+  },
+  "license": "MIT",
+  "author": "Guillaume DORBES",
+  "type": "module",
+  "exports": "./agent.mjs",
+  "main": "./agent.mjs",
+  "directories": {
+    "lib": "esm"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "socket.io-client": "^4.8.1",
-    "rpi-io": ">=2.1.0"
+    "rpi-io": ">=2.1.1"
   }
 }
