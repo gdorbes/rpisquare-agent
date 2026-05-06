@@ -9,22 +9,64 @@
 
 **rpisquare-agent** has been tested with Pi 5, Pi 4B, Pi Zero 2 W running Raspberry Pi OS v12 a.k.a. Bookworm and Nodejs v23+.
 
+
+
 ## Prerequisites
 
-As **rpisquare-agent**  uses the  [**rpi-io**](https://github.com/gdorbes/rpi-io) module for GPIO interactions, the prerequisites are the same.
+As **rpisquare-agent**  is based on the  [**rpi-io**](https://github.com/gdorbes/rpi-io) module for GPIO interactions, **check carefully [rpi-io prerequisites](https://github.com/gdorbes/rpi-io#prerequisites)** before going further.
 
-Also **rpisquare-agent**  must connected to the Internet to communicate with the *rpisquare API server* based on standard HTTP exchanges and  [socket.io](https://socket.io/) WebSocket.
+Also **rpisquare-agent**  must be connected to the Internet to communicate with the *rpisquare API server* to register and to receive commands. Theses communications use standard HTTP and  [socket.io](https://socket.io/) WebSocket.
+
+
 
 ## Installation
 
-From you project directory, just install the NPM package.
-
-* install the NPM package
+From you project directory e.g. `~/myAgent`
 
 ```shell
-npm i rpisquare-agent
+# Go to your Raspberry Pi project main directory.
+cd ~/myAgent
+
+# Load rpisquare-agent module from Github latest release
+npm install https://github.com/gdorbes/rpisquare-agent/tarball/v0.6.2
+
+# Compile rpi-io module
+cd node_modules/rpi-io/
+npm install
+cd ../..
+
+# Launch agent
+node node_modules/rpisquare-agent/agent.mjs
 ```
-## TO BE CONTINUED
+
+
+## First launch
+
+### Sign up to [app.rpisquare.com](https://app.rpisquare.com)
+
+REMINDER: Rpisquare agent purpose is to execute GPIO-related command initiated by remote scripts.  It is then mandatory to link the device where the agent is installed with a defined user. 
+
+As [app.rpisquare.com](https://app.rpisquare.com) is the place to configure what devices and peripheral can be controlled remotely, you must then sign up to [app.rpisquare.com](https://app.rpisquare.com) to declare what devices are installed with a an rpisquare agent.
+
+PLEASE NOTE : [app.rpisquare.com](https://app.rpisquare.com)  is a free service and just requires a valid email address to be used.
+
+When you are signed in, you can then register as many agents as you wish from the web app.
+
+### Identify device Serial Number
+
+On first launch, the agent is not associated to any user.
+
+### Agent registration 
+
+### Agent already registered
+
+
+
+## Further launches
+
+### Manual launches
+
+### Automatic launch on device boot
 
 ## Licence
 

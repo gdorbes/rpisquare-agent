@@ -1,6 +1,6 @@
 {
   "name": "rpisquare-agent",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "Raspberry Pi agent for service rpisquare.com",
   "keywords": [
     "raspberry",
