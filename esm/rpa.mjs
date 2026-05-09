@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------
 // Node.js local modules
 import {readFileSync, writeFileSync, existsSync} from "fs"
-import {spawn} from "child_process"
 
 // Modules installed with NPM
 import {io} from "socket.io-client"
@@ -13,7 +12,7 @@ import {RIO} from "rpi-io"
 
 // Project modules
 import {log, warn, traceCfg} from "./log.mjs"
-import {hardware, iface, model, os, serial, isRPi} from "./sys.mjs"
+import {hardware, iface, model, os, serial} from "./sys.mjs"
 import {api} from "./net.mjs"
 import {ctrlC, sleep} from "./ctl.mjs"
 
@@ -28,6 +27,7 @@ rpa.SOCKET_SERVER = "https://socket.rpisquare.com"
 rpa.SOCKET_OPTIONS = {
     secure: true,
     forceNew: true,
+    autoConnect: false,
     transports: ["websocket"],
     pingInterval: 10000,
     pingTimeout: 10000
@@ -44,20 +44,23 @@ rpa.interrupted = false // Interruption flag
 rpa.config = {}         // Local configuration (e.g. room
 rpa.io = {}             // GPIO configuration
 rpa.socket = {}         // Socket data
-rpa.socketIsConnected = false
+rpa.socket = io(rpa.SOCKET_SERVER, {
+    ...rpa.SOCKET_OPTIONS, ...{
+        query: {
+            serial: rpa.prop.serial
+        }
+    }
+})
 
+// -------------------------------------------------------------------
+// FUNCTIONS
 /** ------------------------------------------------------------------
- * @function rpa.respawn
- * @description Close all GPIOs then
- *              Spawn a fresh copy of current script and dies
+ * @function rpa.reload
+ * @description Close all GPIOs then restart rpisquareAgent()
  */
-rpa.respawn = () => {
+rpa.reload = () => {
     RIO.closeAll()
-    spawn(process.execPath, process.argv.slice(1), {
-        detached: true,  // child independent of parent
-        stdio: 'inherit' // inherit stdin/stdout/stderr
-    }).unref() // parent exit when child start
-    process.exit() // kill all process
+    setImmediate(rpisquareAgent)
 }
 /** ------------------------------------------------------------------
  * @function rpa.cfgWrite
@@ -120,40 +123,48 @@ rpa.rlog = function () {
  */
 rpa.gpiosLoad = async () => {
 
-    const res = await api(rpa.API_SERVER, "/agent/gpio/list", {
-        room: rpa.config.room,
-        serial: rpa.prop.serial
-    })
+    // If config found i.e. already registered => Load GPIO definition
+    if (rpa.config.room && rpa.prop.serial) {
 
-    // Stop on API error
-    if (res.code !== 200) {
-        return -1
-    }
+        const res = await api(rpa.API_SERVER, "/agent/gpio/list", {
+            room: rpa.config.room,
+            serial: rpa.prop.serial
+        })
 
-    // Stop on empty data
-    if (!res.data) {
-        log("GPIO definition is empty")
-        return 0
-    }
-
-    rpa.io = {} // E.g. {17: {name: "toto", instance: instanceObject}
-    for (const [id, cfg] of Object.entries(res.data)) {
-
-        rpa.io[cfg.line] = {name: cfg.name}
-        switch (cfg.mode) {
-            case "out":
-                rpa.io[cfg.line].instance = new RIO(cfg.line, "output", {value: cfg.init.value})
-                break
-            case "in":
-                rpa.io[cfg.line].instance = new RIO(cfg.line, "input", {bias: cfg.init.bias})
-                break
-            case "pwm":
-                rpa.io[cfg.line].instance = new RIO(cfg.line, "pwm", cfg.init)
-                break
+        // Reload on API error
+        if (res.code !== 200) {
+            warn("network error => restarting in", rpa.restartTimeOut, "seconds")
+            await sleep(rpa.restartTimeOut * 1000)
+            rpa.reload()
+            return
         }
-        rpa.rlog("line", cfg.line, "is ready for", cfg.mode.toUpperCase(), "operations")
+
+        // Stop on empty data
+        if (!res.data) {
+            log("GPIO definition is empty")
+            return 0
+        }
+
+        // Found GPIO definitions
+        rpa.io = {} // E.g. {17: {name: "toto", instance: instanceObject}
+        for (const [id, cfg] of Object.entries(res.data)) {
+
+            rpa.io[cfg.line] = {name: cfg.name}
+            switch (cfg.mode) {
+                case "out":
+                    rpa.io[cfg.line].instance = new RIO(cfg.line, "output", {value: cfg.init.value})
+                    break
+                case "in":
+                    rpa.io[cfg.line].instance = new RIO(cfg.line, "input", {bias: cfg.init.bias})
+                    break
+                case "pwm":
+                    rpa.io[cfg.line].instance = new RIO(cfg.line, "pwm", cfg.init)
+                    break
+            }
+            rpa.rlog("line", cfg.line, "is ready for", cfg.mode.toUpperCase(), "operations")
+        }
+        return Object.entries(res.data).length
     }
-    return Object.entries(res.data).length
 }
 
 /** ------------------------------------------------------------------
@@ -294,7 +305,7 @@ rpa.execCommand = (args, acknowledge) => {
                 return
             case "restartAgent":
                 rpa.cmdFeedback(200, ERR_MSG[200], "", acknowledge, args)
-                rpa.respawn()
+                rpa.reload()
                 return
             // 240
             default:
@@ -309,44 +320,124 @@ rpa.execCommand = (args, acknowledge) => {
     }
 }
 // -------------------------------------------------------------------
+// SOCKET EVENTS
+/** ------------------------------------------------------------------
+ * @event connect
+ * @description Received when socket connection is OK
+ *              Load GPIO definition
+ */
+// Event: Socket connection OK
+rpa.socket.on("connect", async () => {
+    log("socket is connected:", rpa.socket.id)
+    await rpa.gpiosLoad()
+})
+
+/** ---------------------------------------------------------------
+ * @event connect_error
+ * @description Received on socket connection error
+ *              Wait some time then restart agent
+ * @param {Object} err
+ */
+rpa.socket.on("connect_error", async err => {
+    warn("Socket connect error:", err.message, "restarting in", rpa.restartTimeOut, "seconds")
+    await sleep(rpa.restartTimeOut * 1000)
+    rpa.reload()
+})
+
+/** ---------------------------------------------------------------
+ * @event register
+ * @description When user room is not forced on run,
+ *              This event is received from API server when
+ *              user register a device with app.rpisquare.com
+ *              and a RPi serial number
+ * @param {Object} args
+ * @param {Function} acknowledge
+ */
+rpa.socket.on("register", async (args, acknowledge) => {
+
+    if (rpa.config) {
+        log("room already defined => overwriting room ID")
+    }
+    try {
+        args = JSON.parse(args)
+        log("args", args)
+
+        rpa.config = {room: args.room}
+        const cfgWritten = rpa.cfgWrite(rpa.config)
+
+        if (cfgWritten) {
+            // Successful acknowledge to server with RPi data
+            acknowledge(JSON.stringify({
+                status: "ok",
+                model: rpa.prop.model,
+                iface: rpa.prop.iface,
+            }))
+
+            // Restart agent
+            rpa.reload()
+        }
+    } catch (err) {
+        warn("Config update error:", err)
+        acknowledge(JSON.stringify({status: err}))
+    }
+})
+
+/** ---------------------------------------------------------------
+ * @event reload
+ * @description Agent update requested by API server to reload GPIO config
+ */
+rpa.socket.on("reload", async () => {
+    rpa.rlog("agent reload")
+    rpa.reload()
+})
+
+
+/** ---------------------------------------------------------------
+ * @event cmd
+ * @description Command received from client with acknowledge requirement
+ *              See method execCommand for details
+ * @param {Object} args - Command arguments
+ * @param {Function} acknowledge
+ */
+rpa.socket.on("cmd", (args, acknowledge) => {
+    rpa.execCommand(args, acknowledge)
+})
+
+// -------------------------------------------------------------------
 // AGENT MAIN FUNCTION
 /** ------------------------------------------------------------------
  * @function rpisquareAgent
  * @description Main agent function
  * @param {Object} opt - See default options below
- * @return {Boolean}
  */
 export const rpisquareAgent = async (opt) => {
 
     const defopt = {
         room: "",   // User communication room
         logLevel: 2, // 2: log+warning, 1: log, 0: none
-        socketConnectionTimeout: 1000,
-        RestartTimetout: 2000,
+        restartTimeOut: 2, // in seconds
     }
     opt = {...defopt, ...opt}
 
+    // Set log level
     traceCfg(opt.logLevel)
 
-    // Stop if not RPi
-    if (!isRPi()) {
-        warn("Wrong device type: Not a Raspberry Pi")
-        return false
-    }
-
     // Init variables
+    rpa.socketConnectionTimeout = opt.socketConnectionTimeout
+    rpa.restartTimeOut = opt.restartTimeOut
     log("hardware:", rpa.prop.hardware)
     log("model:", rpa.prop.model)
     log("operating system:", rpa.prop.os)
     log("network interface:", rpa.prop.iface)
     log("serial number:", rpa.prop.serial)
 
-    // Init config with room if any and valid
-    if (opt.room.length === 32) {
-        rpa.config = {room: opt.room}
-        rpa.cfgWrite(rpa.config)
+    // Init config with room if any valid
+    if (opt.room.length > 0) {
+        if (/^[0-9a-fA-F]{32}$/.test(opt.room)) {
+            rpa.config = {room: opt.room}
+            rpa.cfgWrite(rpa.config)
+        } else throw new Error("Invalid room ID")
     }
-
 
     // Run ctrl+c monitor => Close RIO instances if any
     ctrlC(() => {
@@ -354,137 +445,10 @@ export const rpisquareAgent = async (opt) => {
         RIO.closeAll()
     })
 
-    // Init socket and related events
-    try {
-        rpa.socket = io(rpa.SOCKET_SERVER, {
-            ...rpa.SOCKET_OPTIONS, ...{
-                query: {
-                    serial: rpa.prop.serial
-                }
-            }
-        })
-
-        /** -----------------------------------------------------------
-         * @event connect
-         * @description Received when socket connection is OK
-         *              Set connection flag for further network operations
-         */
-        // Event: Socket connection OK
-        rpa.socket.on("connect", () => {
-            rpa.socketIsConnected = true
-            log("socket is connected:", rpa.socket.id)
-        })
-
-        /** -----------------------------------------------------------
-         * @event connect_error
-         * @description Received on socket connection error
-         *              Wait some time then restart Node.js process
-         * @param {Object} err
-         */
-        rpa.socket.on("connect_error", async err => {
-            warn("Socket connect error:", err.message)
-            await sleep(opt.RestartTimetout)
-            rpa.respawn()
-        })
-
-        /** -----------------------------------------------------------
-         * @event register
-         * @description When user room is not forced on run,
-         *              This event is received from API server when
-         *              user register a device with app.rpisquare.com
-         *              and a RPi serial number
-         * @param {Object} args
-         * @param {Function} acknowledge
-         */
-        if (opt.room === "") rpa.socket.on("register", async (args, acknowledge) => {
-                try {
-                    args = JSON.parse(args)
-                    log("args", args)
-
-                    rpa.config = {room: args.room}
-                    const cfgWritten = rpa.cfgWrite(rpa.config)
-
-                    if (cfgWritten) {
-                        // Successful acknowledge to server with RPi data
-                        acknowledge(JSON.stringify({
-                            status: "ok",
-                            model: rpa.prop.model,
-                            iface: rpa.prop.iface,
-                        }))
-
-                        // Restart agent
-                        rpa.respawn()
-                    }
-                } catch (err) {
-                    warn("Config update error:", err)
-                    acknowledge(JSON.stringify({status: err}))
-                }
-            }
-        )
-
-        /** -----------------------------------------------------------
-         * @event reload
-         * @description Agent update requested by API server to reload GPIO config
-         */
-        rpa.socket.on("reload", async () => {
-            RIO.closeAll()
-            rpa.rlog("agent reload")
-            rpa.respawn()
-        })
-
-
-        /** -----------------------------------------------------------
-         * @event cmd
-         * @description Command received from client with acknowledge requirement
-         *              See method execCommand for details
-         * @param {Object} args - Command arguments
-         * @param {Function} acknowledge
-         */
-        rpa.socket.on("cmd", (args, acknowledge) => {
-            rpa.execCommand(args, acknowledge)
-        })
-    } catch (err) {
-        RIO.closeAll()
-        warn("Network error - please retry later: ", err)
-        return false
-    }
-
-    try {
-        // Wait for socket connection to continue
-        let i = Math.round(opt.socketConnectionTimeout / 10)
-        while (!rpa.socketIsConnected && i > 0) {
-            await sleep(10, false)
-            i--
-        }
-        if (i <= 0) {
-            warn("Socket connection issue => retry later")
-            return false
-        }
-
-        // Room forced but config file is missing
-        if (opt.room.length > 0 && !rpa.cfgRead()) {
-            warn("Configuration file is missing!")
-            warn("Please delete file '__cfg__.json' and restart device registration from app.rpisquare.com.")
-            return false
-        }
-
-        // If config found i.e. already registered => Load GPIO definition
-        if (rpa.cfgRead()) {
-            const loaded = await rpa.gpiosLoad()
-            if (loaded === -1) {
-                warn("Serial number and room id  do not match!")
-                warn("Please delete file '__cfg__.json' and restart device registration from app.rpisquare.com.")
-                return false
-            }
-
-            log("#line(s) initialized:", Math.max(0, await loaded))
-            return true
-        }
-    } catch (err) {
-        RIO.closeAll()
-        warn("Uncatched error: ", err)
-        return false
-    }
+    // If already connected => Load GPIO definition
+    if(rpa.socket.connected) await rpa.gpiosLoad()
+    // Otherwise connect => Connect event will take care GPIO definition loading
+    else rpa.socket.connect()
 }
 
 // -------------------------------------------------------------------

@@ -28,7 +28,7 @@ From you project directory e.g. `~/myAgent`
 cd ~/myAgent
 
 # Load rpisquare-agent module from Github latest release
-npm install https://github.com/gdorbes/rpisquare-agent/tarball/v0.6.2
+npm install https://github.com/gdorbes/rpisquare-agent/tarball/v0.7.0
 
 # Compile rpi-io module
 cd node_modules/rpi-io/
@@ -36,7 +36,7 @@ npm install
 cd ../..
 
 # Launch agent
-node node_modules/rpisquare-agent/agent.mjs
+node node_modules/rpisquare-agent/rpi-agent.mjs
 ```
 
 
