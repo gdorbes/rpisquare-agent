@@ -13,7 +13,7 @@ node_modules/
 # App config file
 config-rpi².json
 
-# Local old files
+# Local archive
 _archive/
 
 # Test packs

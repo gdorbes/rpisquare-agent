@@ -1,7 +1,7 @@
 # rpisquare-agent 
-![Static Badge](https://img.shields.io/badge/rpisquare--agent-_0.6.x_-FF5500?style=flat) ![Static Badge](https://img.shields.io/badge/Nodejs-%3E_23-66cc33?logo=nodedotjs&logoColor=white) ![Static Badge](https://img.shields.io/badge/NPM-%3E_10-CC3534?logo=npm&logoColor=white) ![Static Badge](https://img.shields.io/badge/Raspberry_Pi-Zero2_4B_5B-C51A4A?logo=raspberrypi&logoColor=white) ![Static Badge](https://img.shields.io/badge/OS-Bookworm_Trixie-0D7AB9?style=flat)
+![Static Badge](https://img.shields.io/badge/rpisquare--agent-_1.0.x_-FF5500?style=flat) ![Static Badge](https://img.shields.io/badge/Nodejs-%3E_23-66cc33?logo=nodedotjs&logoColor=white) ![Static Badge](https://img.shields.io/badge/NPM-%3E_10-CC3534?logo=npm&logoColor=white) ![Static Badge](https://img.shields.io/badge/Raspberry_Pi-Zero2_4B_5B-C51A4A?logo=raspberrypi&logoColor=white) ![Static Badge](https://img.shields.io/badge/OS-Bookworm_Trixie-0D7AB9?style=flat)
 
-# Work in Progress ⚠️ Don't use yet
+
 
 **rpisquare-agent** is part of the [rpisquare.com](https://rpisquare.com) service that aims at managing remote Raspberry Pi GPIO-based sensors and actuators. It has been tested with Pi 5, Pi 4B, Pi Zero 2 W running Raspberry Pi OS v12 a.k.a. Bookworm and Nodejs v23+.
 
@@ -30,9 +30,9 @@ From you project directory e.g. `~/myAgent`
 cd ~/myAgent
 
 # Load rpisquare-agent module from Github latest release
-npm install https://github.com/gdorbes/rpisquare-agent/tarball/v0.7.1
+npm install https://github.com/gdorbes/rpisquare-agent/tarball/v1.0
 
-# Compile rpi-io module to complete install and back to your project directory
+# Compile rpi-io module to complete install
 cd node_modules/rpi-io/
 npm install
 cd ../..
@@ -44,9 +44,9 @@ cd ../..
 
 As **rpisquare-agent** purpose is to execute GPIO-related command initiated by remote scripts.  It is then mandatory to link the device where the agent is installed with a defined user.  
 
-This is done with the  [app.rpisquare.com](https://app.rpisquare.com) web app which is the is the place to configure what devices and peripheral can be controlled remotely by some user.
+This is done using the  [app.rpisquare.com](https://app.rpisquare.com) web app which is the is the place to configure what devices and peripherals can be controlled remotely by some user.
 
-The very first step is then to sign up to  [app.rpisquare.com](https://app.rpisquare.com) which is a free service that just requires a valid email address to be used.
+The very first step is then to sign up / sign in to  [app.rpisquare.com](https://app.rpisquare.com) which is a free service that just requires a valid email address to be used.
 
 When done, you can then register as many agents as you wish from the web app.
 
@@ -54,15 +54,11 @@ When done, you can then register as many agents as you wish from the web app.
 
 Registering **rpisquare-agent**  agent installed on  a Raspberry Pi device is a straightforward process:
 
-1. Launch the agent from your project directory and read looged data in your console.
+1. Launch the agent from your project directory and read logged data in your console.
 
 ```sh
-# Launch test script from project directory
-~/myAgent $ node test/launch-agent.mjs 
-10:40:20.768 🔎  hardware: raspberry
-10:40:20.895 🔎  model: raspberry pi 5 model b rev 1.0
-10:40:20.896 🔎  operating system: { version: '12', name: 'bookworm' }
-10:40:20.896 🔎  network interface: wlan
+# Launch test script from your project directory
+~/myAgent $ node node_modules/rpisquare-agent/test/launch-agent.mjs
 10:41:42.974 🔎  hardware: raspberry
 10:41:43.006 🔎  model: raspberry pi 5 model b rev 1.0
 10:41:43.006 🔎  operating system: { version: '12', name: 'bookworm' }
@@ -79,27 +75,159 @@ Registering **rpisquare-agent**  agent installed on  a Raspberry Pi device is a 
 ### Step 3: Declare your peripherals on [app.rpisquare.com](https://app.rpisquare.com)
 
 2. You can now declare your GPIOs as in the example below. Please note:
-   * The green point 🟢  close to the agent name in side list means that the agent is connected to the server. If not, the point is red 🔴.
-   * By default, the agent name is the serial number on its device, but you can rename it with your own friendly name
+   * The green point 🟢  close to the agent name in side list means that the agent is connected to the server and ready to receive commands. If not, the point is red 🔴.
+   * By default, the agent name is the serial number of the RPi device, but you can rename it with your own friendly name
    * You can export/import each agent configuration for backup and easy device reinstall if required.
 
 ![peripherals](https://raw.githubusercontent.com/gdorbes/rpisquare-agent/refs/heads/master/img/declaring-peripherals.webp)
 
-### Identify device Serial Number
+Your agent is now ready to receive commands either from  the [rpisquare-sdk](https://github.com/gdorbes/rpisquare-sdk) integrated into your project or from  [app.rpisquare.com](https://app.rpisquare.com)  where you can test your remote peripherals as in the example above:
 
-On first launch, the agent is not associated to any user.
-
-### Agent registration 
-
-### Agent already registered
+* Start/Stop monitoring of input GPIO and see results in the embedded console.
+* Set/Reset output GPIO and check results on your electronic circuit.
+* Control PWM peripherals thanks to sliders.
 
 
 
-## Further launches
+## Next launches
 
-### Manual launches
+### Manual launches from your project directory
+
+#### Simple launch command
+
+```sh
+# Launch test script from project directory
+~/myAgent $ node test/launch-agent.mjs 
+```
+
+
+
+#### Simple launch from Node.js script
+
+```javascript
+// Import module
+import {rpisquareAgent} from "./node_modules/rpisquare-agent/esm/rpa.mjs"
+// Launch  module without parameters 
+rpisquareAgent()
+```
+
+
+
+#### Launch from Node.js script with parameters
+
+```javascript
+// Import module
+import {rpisquareAgent} from "./node_modules/rpisquare-agent/esm/rpa.mjs"
+// Launch  module with optional parameters 
+rpisquareAgent({
+    room: '',
+    logLevel: 2, // 2: log+warning, 1: log, 0: none
+    restartTimeOut: 2, // in seconds
+})
+```
+
+The example above is presented with the default parameters.
+
+**Parameter `room`**
+
+`room`  is a user communication room ID (see user section in [app.rpisquare.com](https://app.rpisquare.com)). By default, this parameter is empty as it is retrieved during the registration step and read locally  after.
+
+The only case where you may need to use this parameter is if you reinstall your device that is already registered. In this situation you can force the agent to be linked to its user communication room.
+
+```javascript
+import {rpisquareAgent} from "./node_modules/rpisquare-agent/esm/rpa.mjs"
+rpisquareAgent({
+    room: 'abcddfbc12345678bfdf226290f8316d'
+})
+```
+
+PLEASE NOTE: A device already registered with some specific user cannot be attached to another user; it must be deleted first from the initial user account in [app.rpisquare.com](https://app.rpisquare.com).
+
+**Parameter `logLevel`**
+
+The logging level may have 3 values:
+
+2. warning and standard log (default)
+
+1. warning only
+
+0. none
+
+**Parameter `restartTimeOut`**
+
+`restartTimeOut` is a delay in seconds before agent restart in case of issues such as network error.
+
+
 
 ### Automatic launch on device boot
+
+#### 1. Create a service file
+
+```sh
+sudo nano /etc/systemd/system/my-agent-script.service
+```
+
+```sh
+[Unit]
+# Name shown in systemctl status and logs
+Description=rpisquare-agent
+
+# Wait for the network to be fully online before starting
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# To replace with your own username and project directory
+User=pi
+WorkingDirectory=/home/pi/myAgent
+
+# The actual command to run — use the full path to node (check with: which node)
+ExecStart=/usr/bin/node /home/pi/myAgent/node_modules/rpisquare-agent/test/launch-agent.mjs
+
+# Restart the service if it exits with an error (non-zero exit code or signal)
+# "always" would restart even on clean exit — "on-failure" is safer
+Restart=on-failure
+
+# Wait 5 seconds before attempting a restart (avoids tight crash loops)
+RestartSec=5
+
+# Send stdout to the systemd journal (accessible via journalctl)
+StandardOutput=journal
+
+# Send stderr to the systemd journal as well
+StandardError=journal
+
+# Inline environment variable — add as many as needed
+Environment=NODE_ENV=production
+
+# Alternatively, load variables from a file (uncomment to use):
+# EnvironmentFile=/home/pi/my-app/.env
+
+[Install]
+# Start this service when the system reaches the standard multi-user state
+# (i.e. normal boot, after all basic services are up)
+WantedBy=multi-user.target
+```
+
+ #### 2. Enable and start the service
+
+```sh
+sudo systemctl daemon-reload
+sudo systemctl enable my-agent-script.service
+sudo systemctl start my-agent-script.service
+```
+
+#### 3. Useful commands
+
+```sh
+sudo systemctl status my-agent-script.service   # check status
+journalctl -u my-agent-script.service -f        # live logs
+sudo systemctl restart my-agent-script.service  # restart
+```
+
+
 
 ## Licence
 

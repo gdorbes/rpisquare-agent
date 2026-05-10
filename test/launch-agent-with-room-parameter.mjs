@@ -16,7 +16,9 @@ room = await rl.question("Enter a 32-character hex room ID or leave empty: ")
 room = room.trim()
 rl.close()
 
-rpisquareAgent({room: room})
+rpisquareAgent({
+    room: room
+})
 // -------------------------------------------------------------------
 // EoF
 // -------------------------------------------------------------------
