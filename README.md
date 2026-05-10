@@ -13,9 +13,11 @@
 
 ## Prerequisites
 
-As **rpisquare-agent**  is based on the  [**rpi-io**](https://github.com/gdorbes/rpi-io) module for GPIO interactions, **check carefully [rpi-io prerequisites](https://github.com/gdorbes/rpi-io#prerequisites)** before going further.
+**rpisquare-agent**  is based on the  [**rpi-io**](https://github.com/gdorbes/rpi-io) module for GPIO interactions, thus **check carefully [rpi-io prerequisites](https://github.com/gdorbes/rpi-io#prerequisites)** before going further.
 
 Also **rpisquare-agent**  must be connected to the Internet to communicate with the *rpisquare API server* to register and to receive commands. Theses communications use standard HTTP and  [socket.io](https://socket.io/) WebSocket.
+
+IT IS STRONGLY RECOMMENDED TO TEST YOUR ELECTRONIC CIRCUIT LOCALLY ON YOUR RASPBERRY PI DEVICE USING THE  [**rpi-io**](https://github.com/gdorbes/rpi-io) MODULE BEFORE CONSIDERING ANY REMOTE USE. 
 
 
 
@@ -28,29 +30,56 @@ From you project directory e.g. `~/myAgent`
 cd ~/myAgent
 
 # Load rpisquare-agent module from Github latest release
-npm install https://github.com/gdorbes/rpisquare-agent/tarball/v0.7.0
+npm install https://github.com/gdorbes/rpisquare-agent/tarball/v0.7.1
 
-# Compile rpi-io module
+# Compile rpi-io module to complete install and back to your project directory
 cd node_modules/rpi-io/
 npm install
 cd ../..
-
-# Launch agent
-node node_modules/rpisquare-agent/rpi-agent.mjs
 ```
-
 
 ## First launch
 
-### Sign up to [app.rpisquare.com](https://app.rpisquare.com)
+### Step 1: Create an account on [app.rpisquare.com](https://app.rpisquare.com)
 
-REMINDER: Rpisquare agent purpose is to execute GPIO-related command initiated by remote scripts.  It is then mandatory to link the device where the agent is installed with a defined user. 
+As **rpisquare-agent** purpose is to execute GPIO-related command initiated by remote scripts.  It is then mandatory to link the device where the agent is installed with a defined user.  
 
-As [app.rpisquare.com](https://app.rpisquare.com) is the place to configure what devices and peripheral can be controlled remotely, you must then sign up to [app.rpisquare.com](https://app.rpisquare.com) to declare what devices are installed with a an rpisquare agent.
+This is done with the  [app.rpisquare.com](https://app.rpisquare.com) web app which is the is the place to configure what devices and peripheral can be controlled remotely by some user.
 
-PLEASE NOTE : [app.rpisquare.com](https://app.rpisquare.com)  is a free service and just requires a valid email address to be used.
+The very first step is then to sign up to  [app.rpisquare.com](https://app.rpisquare.com) which is a free service that just requires a valid email address to be used.
 
-When you are signed in, you can then register as many agents as you wish from the web app.
+When done, you can then register as many agents as you wish from the web app.
+
+### Step 2: Register your device on [app.rpisquare.com](https://app.rpisquare.com)
+
+Registering **rpisquare-agent**  agent installed on  a Raspberry Pi device is a straightforward process:
+
+1. Launch the agent from your project directory and read looged data in your console.
+
+```sh
+# Launch test script from project directory
+~/myAgent $ node test/launch-agent.mjs 
+10:40:20.768 🔎  hardware: raspberry
+10:40:20.895 🔎  model: raspberry pi 5 model b rev 1.0
+10:40:20.896 🔎  operating system: { version: '12', name: 'bookworm' }
+10:40:20.896 🔎  network interface: wlan
+10:41:42.974 🔎  hardware: raspberry
+10:41:43.006 🔎  model: raspberry pi 5 model b rev 1.0
+10:41:43.006 🔎  operating system: { version: '12', name: 'bookworm' }
+10:41:43.007 🔎  network interface: wlan
+10:41:43.007 🔎  serial number: 55a43dc5bf9a8f54
+10:41:43.217 🔎  socket is connected: rNVvFa2lm09PaFgRAAC7
+```
+
+2. Copy your device serial number. In this example: `55a43dc5bf9a8f54`.
+3. In  [app.rpisquare.com](https://app.rpisquare.com), click the ✚ sign to register a new RPi, paste the serial number in the form and click OK.  Your RPi device is now linked to your user account 
+
+### Step 3: Declare your peripherals on [app.rpisquare.com](https://app.rpisquare.com)
+
+2. You can now declare your GPIOs as in the example below. Please note:
+   * The green point 🟢  close to the agent name in side list means that the agent is connected to the server. If not, the point is red 🔴.
+   * By default, the agent name is the serial number on its device, but you can rename it with your own friendly name
+   * You can export/import each agent configuration for backup and easy device reinstall if required.
 
 ### Identify device Serial Number
 
