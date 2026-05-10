@@ -74,12 +74,16 @@ Registering **rpisquare-agent**  agent installed on  a Raspberry Pi device is a 
 2. Copy your device serial number. In this example: `55a43dc5bf9a8f54`.
 3. In  [app.rpisquare.com](https://app.rpisquare.com), click the ✚ sign to register a new RPi, paste the serial number in the form and click OK.  Your RPi device is now linked to your user account 
 
+![register](https://raw.githubusercontent.com/gdorbes/rpisquare-agent/refs/heads/master/img/registering-serial-number.webp)
+
 ### Step 3: Declare your peripherals on [app.rpisquare.com](https://app.rpisquare.com)
 
 2. You can now declare your GPIOs as in the example below. Please note:
    * The green point 🟢  close to the agent name in side list means that the agent is connected to the server. If not, the point is red 🔴.
    * By default, the agent name is the serial number on its device, but you can rename it with your own friendly name
    * You can export/import each agent configuration for backup and easy device reinstall if required.
+
+![peripherals](https://raw.githubusercontent.com/gdorbes/rpisquare-agent/refs/heads/master/img/declaring-peripherals.webp)
 
 ### Identify device Serial Number
 
