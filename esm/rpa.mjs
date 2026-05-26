@@ -438,6 +438,10 @@ export const rpisquareAgent = async (opt) => {
             rpa.cfgWrite(rpa.config)
         } else throw new Error("Invalid room ID")
     }
+    // Otherwise try to load stored room ID
+    else {
+        rpa.cfgRead()
+    }
 
     // Run ctrl+c monitor => Close RIO instances if any
     ctrlC(() => {
