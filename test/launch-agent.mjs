@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------
-// RPi² AGENT LAUNCHER
+// RPi² DEFAULT AGENT LAUNCHER
 // -------------------------------------------------------------------
 import {rpisquareAgent} from "../esm/rpa.mjs"
 rpisquareAgent()

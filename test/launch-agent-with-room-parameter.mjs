@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------
-// RPi² AGENT LAUNCHER WITH FORCED ROOM
+// RPi² AGENT LAUNCHER WITH FORCED ROOM ID
 // PLEASE NOTE: Raspberry Pi device must be already registered with
 //              the room ID you enter. If not, agent will stop.
 // -------------------------------------------------------------------
