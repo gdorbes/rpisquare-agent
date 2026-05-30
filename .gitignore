@@ -16,6 +16,4 @@ config-rpi².json
 # Local archive
 _archive/
 
-# Test packs
-*.tgz
 
