@@ -1,11 +1,8 @@
 # Changelog
-## [1.0.1] - 2026-05-26
-### Fixed
-- Error in *rpisquareAgent* when already registered and not forced.
 
-## [1.0.x] - 2026-05-10
+## [1.0.x] - 2026-06-01
 ### Changed
-- initial public version
+- first public version
 
 ## [0.6.x] - 2026-04-01
 ### Added
