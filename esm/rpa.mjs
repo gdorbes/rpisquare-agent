@@ -216,7 +216,7 @@ rpa.execCommand = (args, acknowledge) => {
 
     // Flag for global commands
     let lineCommand = true
-    if (["restartAgent"].indexOf(args.command) !== -1) lineCommand = false
+    if (["agentRestart"].indexOf(args.command) !== -1) lineCommand = false
 
     // 210: Line not found
     if (lineCommand && !rpa.io[args.line]) {
@@ -275,7 +275,7 @@ rpa.execCommand = (args, acknowledge) => {
                         time: new Date()
                     })
                     rpa.rlog("line", args.line, "monitored event", edge)
-                }, "both", args.params.rebounce)
+                }, args.params.edge, args.params.rebounce)
                 rpa.cmdFeedback(200, ERR_MSG[200], "", acknowledge, args)
                 return
             case "monitoringStop":
@@ -303,7 +303,7 @@ rpa.execCommand = (args, acknowledge) => {
                 rpa.io[args.line].instance.pwmDuty(args.params.dutyPercent)
                 rpa.cmdFeedback(200, ERR_MSG[200], args.params.dutyPercent, acknowledge, args)
                 return
-            case "restartAgent":
+            case "agentRestart":
                 rpa.cmdFeedback(200, ERR_MSG[200], "", acknowledge, args)
                 rpa.reload()
                 return
