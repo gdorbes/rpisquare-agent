@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------
-// RPi² AGENT - HW INTERFACE
+// RPi² AGENT - DEVICE INTERFACE
 // -------------------------------------------------------------------
 import {platform as platfunc} from "os"
 import {readFileSync} from "fs"
