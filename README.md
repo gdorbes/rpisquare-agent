@@ -3,7 +3,7 @@
 
 
 
-**rpisquare-agent** is part of the [rpisquare.com](https://rpisquare.com) service that aims at managing remote Raspberry Pi GPIO-based sensors and actuators. It has been tested with Pi 5, Pi 4B, Pi Zero 2 W running Raspberry Pi OS v12 a.k.a. Bookworm and Nodejs v23+.
+**rpisquare-agent** is part of the [rpisquare.com](https://rpisquare.com) service that aims at managing remote Raspberry Pi GPIO-based sensors and actuators. 
 
 **rpisquare-agent** is a module to install on Raspberry Pi devices to manage their GPIOs remotely. See [rpisquare.com](https://rpisquare.com) for further details about the solution architecture and components.
 
@@ -42,7 +42,7 @@ cd ../..
 
 ### Step 1: Create an account on [app.rpisquare.com](https://app.rpisquare.com)
 
-As **rpisquare-agent** purpose is to execute GPIO-related command initiated by remote scripts.  It is then mandatory to link the device where the agent is installed with a defined user.  
+As **rpisquare-agent** purpose is to execute GPIO-related command initiated by remote scripts.  It is then mandatory to link the device where the agent is installed to its owner  
 
 This is done using the  [app.rpisquare.com](https://app.rpisquare.com) web app which is the is the place to configure what devices and peripherals can be controlled remotely by some user.
 
