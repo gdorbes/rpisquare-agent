@@ -229,7 +229,7 @@ sudo systemctl restart my-agent-script.service  # restart
 
 
 
-## Licence
+## License
 
-MIT
+[EUPL](https://interoperable-europe.ec.europa.eu/collection/eupl)
 
