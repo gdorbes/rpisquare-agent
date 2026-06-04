@@ -25,7 +25,7 @@ IT IS STRONGLY RECOMMENDED TO TEST YOUR ELECTRONIC CIRCUIT LOCALLY ON YOUR RASPB
 
 From you project directory e.g. `~/myAgent`
 
-```shell
+```sh
 # Go to your Raspberry Pi project main directory.
 cd ~/myAgent
 
